@@ -1,0 +1,10 @@
+REST API Application
+
+This project will feature:
+* Docker
+* Apache Kafka
+* Flask
+
+Other things to look into:
+* Docker nginx
+* Reverse Proxy
