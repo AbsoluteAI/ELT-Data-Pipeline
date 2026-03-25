@@ -10,6 +10,10 @@ def test_aws_connection():
     region = os.getenv("AWS_DEFAULT_REGION")
     bucket_name = os.getenv("AWS_S3_BUCKET_NAME")
 
+    if not bucket_name:
+        print("Error: AWS_S3_BUCKET_NAME not found")
+        return False
+
     print("Testing AWS connection...")
     print(f"Region: {region}")
     print(f"Bucket: {bucket_name}")
