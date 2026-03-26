@@ -10,8 +10,6 @@ import sys
 import os
 import boto3
 from dotenv import load_dotenv
-from gridstatusio import GridStatusClient
-import pandas as pd
 from pathlib import Path
 
 ##################
@@ -134,69 +132,7 @@ def connect_aws():
     except Exception as e:
         print(f"Connection failed: {e}")
 
-# connect to api dataset via gridstatus client
-def extract_api_data():
-
-    # load environment variables
-    load_dotenv()
-
-    # assign env gridstatus api key to variable
-    gridstatus_api_key = os.getenv("GRIDSTATUS_API_KEY")
-
-    # try connecting to gridstatus client with api key
-    try:
-        print(f"\nConnecting to API...")
-        client = GridStatusClient(gridstatus_api_key)
-
-        print("Attempting to extract data...")
-
-        # Fetch data as pandas DataFrame
-        df = client.get_dataset(
-          dataset="aeso_supply_and_demand",
-          start="2026-03-22",
-          end="2026-03-25",
-          timezone="market",
-        )
-
-        print(f"Data extraction successful.\n")
-        # print(f"Printing contents:{df.head()}")
-
-        return df
-
-    # handle exception with error description output
-    except Exception as e:
-        print(f"Data extraction failed.\nError: {e}")
-
-# write the pandas dataframe to a new csv file
-def data_csv(df):
-    global folder_path, full_path
-
-    # check if the file path exists
-    if not folder_path.exists():
-        folder_path = Path("../../data/raw")
-
-        if not folder_path.exists():
-            print("There was an error creating the folder.")
-    else:
-        pass
-
-    # check and remove previous file to save the new file
-
-    # copy dataframe contents to csv file and save under data/raw/
-    try:
-        df.to_csv(full_path, index=False)
-        print(f"Data csv successfully saved to {full_path}\n")
-
-    except Exception as e:
-        print(f"Error: {e}")
-
 def main():
-    # extract data from gridstatus api and copy it to a pandas dataframe
-    df = pd.DataFrame(extract_api_data())
-
-    # copy the pandas dataframe data to a new csv file
-    data_csv(df)
-
     # test the aws s3 connection
     connect_aws()
 
