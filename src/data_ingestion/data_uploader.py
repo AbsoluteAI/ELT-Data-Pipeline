@@ -19,10 +19,8 @@ from pathlib import Path
 # define the folder and file paths for the csv data file
 # create s3 client
 
-folder_path = Path("../../data/raw")
-file_name = Path("aeso_supply_and_demand.csv")
-full_path = os.path.join(folder_path, file_name)
-os.makedirs(folder_path, exist_ok=True)
+folder_path = Path("./data/raw")
+# os.makedirs(folder_path, exist_ok=True)
 
 # assign env variables
 load_dotenv()
@@ -67,28 +65,31 @@ def verify_upload():
 
 # load the data into the s3 bucket
 def data_load(s3):
-    global folder_path, file_name, bucket_name
+    global folder_path, bucket_name
+
+    json_files = list(folder_path.glob("*.json"))
     csv_files = list(folder_path.glob("*.csv"))
+    parquet_files = list(folder_path.glob("*.parquet"))
 
     uploaded_count = 0
-    for csv_file in csv_files:
+    for file in json_files:
 
         # create data lake structure
-        s3_key = f"raw_data/{csv_file.name}"
-        print(f"\nLoading data from {csv_file.name}...")
+        s3_key = f"raw_data/{file.name}"
+        print(f"\nLoading data from {file.name}...")
 
         try:
-            s3.upload_file(csv_file, bucket_name, s3_key)
+            s3.upload_file(file, bucket_name, s3_key)
             print(f"Data upload successful.\nData uploaded to s3://{bucket_name}/{s3_key}\n")
             uploaded_count += 1
 
         except Exception as upload_error:
             print(f"Data upload failed.\nError: {upload_error}")
 
-    if uploaded_count == len(csv_files):
-        print(f"Successfully loaded {len(csv_files)} files.\n")
+    if uploaded_count == len(json_files):
+        print(f"Successfully loaded {len(json_files)} files.\n")
     else:
-        print(f"Only {len(csv_files)} files were successfully loaded.")
+        print(f"Only {len(files)} files were successfully loaded.")
 
 # connect to the s3 bucket
 def connect_aws():
