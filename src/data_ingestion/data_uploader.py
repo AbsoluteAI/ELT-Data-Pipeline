@@ -72,7 +72,7 @@ def data_load(s3):
     parquet_files = list(folder_path.glob("*.parquet"))
 
     uploaded_count = 0
-    for file in json_files:
+    for file in parquet_files:
 
         # create data lake structure
         s3_key = f"raw_data/{file.name}"
@@ -86,10 +86,10 @@ def data_load(s3):
         except Exception as upload_error:
             print(f"Data upload failed.\nError: {upload_error}")
 
-    if uploaded_count == len(json_files):
-        print(f"Successfully loaded {len(json_files)} files.\n")
+    if uploaded_count == len(parquet_files):
+        print(f"Successfully loaded {len(parquet_files)} files.\n")
     else:
-        print(f"Only {len(files)} files were successfully loaded.")
+        print(f"Only {len(parquet_files)} files were successfully loaded.")
 
 # connect to the s3 bucket
 def connect_aws():

@@ -1,5 +1,5 @@
 #############
-# data_extractor.py
+# data_extractor_polling.py
 #############
 
 ###################
@@ -17,6 +17,7 @@ import pandas as pd
 import time
 import glob
 import data_uploader
+from prefect import flow, task, get_run_logger
 
 ##################
 # global variables
@@ -42,6 +43,7 @@ url = f"https://api.nasa.gov/DONKI/FLR?startDate=2016-01-01&endDate=2016-01-30&a
 def remove_files():
     pass
 
+@task(name="file_incrementation", retries=2, retry_delay_seconds=20)
 def file_incrementation(ext):
     global folder_path
 
@@ -52,6 +54,7 @@ def file_incrementation(ext):
 
     return file_number
 
+@task(name="create_parquet_file", retries=2, retry_delay_seconds=20)
 def csv_to_parquet():
     global full_path
 
@@ -71,6 +74,7 @@ def csv_to_parquet():
     # print(df.head())
 
 # connect to api dataset via gridstatus client
+@task(name="create_csv_file", retries=2, retry_delay_seconds=20)
 def create_csv_file(df):
 
     csv_count = file_incrementation("csv")
@@ -85,6 +89,7 @@ def create_csv_file(df):
         print(f"Error writing to csv file: {e}")
         return False
 
+@task(name="create_json_file", retries=2, retry_delay_seconds=20)
 def create_json_file(data):
     global full_path, url
 
@@ -99,8 +104,12 @@ def create_json_file(data):
     except IOError as e:
         print(f"Error creating json file: {e}")
 
+@flow(name="run_poll")
 def run_poll():
     global url, call_count, step_interval
+
+    logger = get_run_logger()
+    logger.info("Polling API for data extraction...")
 
     while True:
         call_count +=1
@@ -145,8 +154,8 @@ def run_poll():
 
             return True
 
-def main():
-    run_poll()
-
-if __name__ == "__main__":
-    sys.exit(main())
+# def main():
+#     run_poll()
+#
+# if __name__ == "__main__":
+#     sys.exit(main())
