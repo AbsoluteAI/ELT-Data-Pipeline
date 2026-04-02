@@ -33,8 +33,8 @@ step_interval = seconds * minutes
 call_count = 0
 
 load_dotenv()
-nasa_api_key = os.getenv("NASA_API_KEY")
-url = f"https://api.nasa.gov/DONKI/FLR?startDate=2016-01-01&endDate=2016-01-30&api_key={nasa_api_key}"
+marketstack_api_key = os.getenv("MARKETSTACK_API_KEY")
+url = f"https://api.marketstack.com/v1/eod?access_key={marketstack_api_key}"
 
 ##################
 # module functions
@@ -111,51 +111,48 @@ def run_poll():
     logger = get_run_logger()
     logger.info("Polling API for data extraction...")
 
-    while True:
-        call_count +=1
-        print(f"\nCall {call_count}:")
+    call_count +=1
+    print(f"\nCall {call_count}:")
 
-        try:
-            response = requests.get(url)
+    try:
+        response = requests.get(url)
 
-            if requests.get(url).status_code == 200:
-                data = response.json()
-                print("Data successfully retrieved")
+        if requests.get(url).status_code == 200:
+            data = response.json()
+            print("Data successfully retrieved")
 
-                create_json_file(data)
+            create_json_file(data)
 
-                df = pd.DataFrame(data)
-                create_csv_file(df)
+            df = pd.DataFrame(data)
+            create_csv_file(df)
 
-                csv_to_parquet()
+            csv_to_parquet()
 
-                data_uploader.main()
+            data_uploader.main()
 
-            else:
-                print(f"Status code: {response.status_code}")
-        except Exception as e:
-            print(f"Error retrieving data: {e}")
+        else:
+            print(f"Status code: {response.status_code}")
+    except Exception as e:
+        print(f"Error retrieving data: {e}")
 
-        try:
-            print("\nNext call in:")
+    try:
+        print("\nNext call in:")
 
-            duration_in_seconds = step_interval
-            for remaining in range(duration_in_seconds, 0, -1):
-                mins, secs = divmod(remaining, 60)
-                timer_display = "{:02}:{:02}".format(mins, secs)
+        duration_in_seconds = step_interval
+        for remaining in range(duration_in_seconds, 0, -1):
+            mins, secs = divmod(remaining, 60)
+            timer_display = "{:02}:{:02}".format(mins, secs)
 
-                sys.stdout.write("\r" + timer_display)
-                sys.stdout.flush()
-                time.sleep(1)
-            sys.stdout.write("\n")
+            sys.stdout.write("\r" + timer_display)
+            sys.stdout.flush()
+            time.sleep(1)
+        sys.stdout.write("\n")
 
-        except Exception as e:
-            print(f"Timer error: {e}")
+    except Exception as e:
+        print(f"Timer error: {e}")
 
-            return True
+def main():
+    run_poll()
 
-# def main():
-#     run_poll()
-#
-# if __name__ == "__main__":
-#     sys.exit(main())
+if __name__ == "__main__":
+    sys.exit(main())

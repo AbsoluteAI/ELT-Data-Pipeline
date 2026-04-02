@@ -1,0 +1,90 @@
+Index: src/data_ingestion/data_extractor.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>#############\r\n# data_extractor.py\r\n#############\r\n\r\n###################\r\n# import statements\r\n###################\r\n\r\nimport sys\r\nimport requests\r\nimport json\r\nfrom pathlib import Path\r\nimport os\r\nfrom dotenv import load_dotenv\r\nfrom pyarrow import csv, parquet\r\nimport pandas as pd\r\nimport time\r\nimport glob\r\nimport data_uploader\r\n\r\n##################\r\n# global variables\r\n##################\r\n\r\nfolder_path = Path(\"./data/raw\")\r\nfile_name = Path(\"nasa_solar_flare_data\")\r\nfull_path = os.path.join(folder_path, file_name)\r\n# os.makedirs(folder_path, exist_ok=True)\r\nseconds = 60\r\nminutes = 1\r\nstep_interval = seconds * minutes\r\ncall_count = 0\r\n\r\nload_dotenv()\r\nnasa_api_key = os.getenv(\"NASA_API_KEY\")\r\nurl = f\"https://api.nasa.gov/DONKI/FLR?startDate=2016-01-01&endDate=2016-01-30&api_key={nasa_api_key}\"\r\n\r\n##################\r\n# module functions\r\n##################\r\n\r\ndef remove_files():\r\n    pass\r\n\r\ndef file_incrementation(ext):\r\n    global folder_path\r\n\r\n    files = glob.glob(os.path.join(folder_path, \"*\" + ext))\r\n\r\n    file_number = len(files) + 1\r\n    # print(f\"Found {file_number - 1} {ext} files\")\r\n\r\n    return file_number\r\n\r\ndef csv_to_parquet():\r\n    global full_path\r\n\r\n    csv_path = file_incrementation(\"csv\") - 1\r\n\r\n    table = csv.read_csv(f\"{full_path} {csv_path}.csv\")\r\n\r\n    parquet_count = file_incrementation(\"parquet\")\r\n\r\n    parquet_path = f\"{full_path} {parquet_count}.parquet\"\r\n\r\n    parquet.write_table(table, parquet_path)\r\n\r\n    print(f\"Data successfully saved to {parquet_path}\")\r\n\r\n    # df = pd.read_parquet(f\"{full_path}.parquet\")\r\n    # print(df.head())\r\n\r\n# connect to api dataset via gridstatus client\r\ndef create_csv_file(df):\r\n\r\n    csv_count = file_incrementation(\"csv\")\r\n\r\n    new_path = f\"{full_path} {csv_count}.csv\"\r\n\r\n    try:\r\n        df.to_csv(new_path, index=False)\r\n        print(f\"Data successfully saved to {new_path}\")\r\n        return True\r\n    except IOError as e:\r\n        print(f\"Error writing to csv file: {e}\")\r\n        return False\r\n\r\ndef create_json_file(data):\r\n    global full_path, url\r\n\r\n    json_count = file_incrementation(\"json\")\r\n\r\n    new_path = f\"{full_path} {json_count}.json\"\r\n\r\n    try:\r\n        with open(new_path, 'w') as json_file:\r\n            json.dump(data, json_file, indent=4)\r\n        print(f\"Data successfully saved to {new_path}\")\r\n    except IOError as e:\r\n        print(f\"Error creating json file: {e}\")\r\n\r\ndef run_poll():\r\n    global url, call_count, step_interval\r\n\r\n    while True:\r\n        call_count +=1\r\n        print(f\"\\nCall {call_count}:\")\r\n\r\n        try:\r\n            response = requests.get(url)\r\n\r\n            if requests.get(url).status_code == 200:\r\n                data = response.json()\r\n                print(\"Data successfully retrieved\")\r\n\r\n                create_json_file(data)\r\n\r\n                df = pd.DataFrame(data)\r\n                create_csv_file(df)\r\n\r\n                csv_to_parquet()\r\n\r\n                data_uploader.main()\r\n\r\n            else:\r\n                print(f\"Status code: {response.status_code}\")\r\n        except Exception as e:\r\n            print(f\"Error retrieving data: {e}\")\r\n\r\n        try:\r\n            print(\"\\nNext call in:\")\r\n\r\n            duration_in_seconds = step_interval\r\n            for remaining in range(duration_in_seconds, 0, -1):\r\n                mins, secs = divmod(remaining, 60)\r\n                timer_display = \"{:02}:{:02}\".format(mins, secs)\r\n\r\n                sys.stdout.write(\"\\r\" + timer_display)\r\n                sys.stdout.flush()\r\n                time.sleep(1)\r\n            sys.stdout.write(\"\\n\")\r\n\r\n        except Exception as e:\r\n            print(f\"Timer error: {e}\")\r\n\r\n            return True\r\n\r\ndef main():\r\n    run_poll()\r\n\r\nif __name__ == \"__main__\":\r\n    sys.exit(main())
+===================================================================
+diff --git a/src/data_ingestion/data_extractor.py b/src/data_ingestion/data_extractor.py
+--- a/src/data_ingestion/data_extractor.py	(revision 50420455a6fc9039bb43233203c0d82ef6e4358c)
++++ b/src/data_ingestion/data_extractor.py	(date 1775018633061)
+@@ -102,48 +102,51 @@
+ def run_poll():
+     global url, call_count, step_interval
+ 
+-    while True:
+-        call_count +=1
+-        print(f"\nCall {call_count}:")
++    try:
++        while True:
++            call_count +=1
++            print(f"\nCall {call_count}:")
+ 
+-        try:
+-            response = requests.get(url)
++            try:
++                response = requests.get(url)
+ 
+-            if requests.get(url).status_code == 200:
+-                data = response.json()
+-                print("Data successfully retrieved")
++                if requests.get(url).status_code == 200:
++                    data = response.json()
++                    print("Data successfully retrieved")
+ 
+-                create_json_file(data)
++                    create_json_file(data)
+ 
+-                df = pd.DataFrame(data)
+-                create_csv_file(df)
++                    df = pd.DataFrame(data)
++                    create_csv_file(df)
+ 
+-                csv_to_parquet()
++                    csv_to_parquet()
+ 
+-                data_uploader.main()
++                    # data_uploader.main()
+ 
+-            else:
+-                print(f"Status code: {response.status_code}")
+-        except Exception as e:
+-            print(f"Error retrieving data: {e}")
++                else:
++                    print(f"Status code: {response.status_code}")
++            except Exception as e:
++                print(f"Error retrieving data: {e}")
+ 
+-        try:
+-            print("\nNext call in:")
++            try:
++                print("\nNext call in:")
+ 
+-            duration_in_seconds = step_interval
+-            for remaining in range(duration_in_seconds, 0, -1):
+-                mins, secs = divmod(remaining, 60)
+-                timer_display = "{:02}:{:02}".format(mins, secs)
++                duration_in_seconds = step_interval
++                for remaining in range(duration_in_seconds, 0, -1):
++                    mins, secs = divmod(remaining, 60)
++                    timer_display = "{:02}:{:02}".format(mins, secs)
+ 
+-                sys.stdout.write("\r" + timer_display)
+-                sys.stdout.flush()
+-                time.sleep(1)
+-            sys.stdout.write("\n")
++                    sys.stdout.write("\r" + timer_display)
++                    sys.stdout.flush()
++                    time.sleep(1)
++                sys.stdout.write("\n")
+ 
+-        except Exception as e:
+-            print(f"Timer error: {e}")
++            except Exception as e:
++                print(f"Timer error: {e}")
+ 
+-            return True
++                return True
++    except KeyboardInterrupt:
++        print("\nTerminating data polling...")
+ 
+ def main():
+     run_poll()

@@ -1,0 +1,415 @@
+Index: docker-compose.yml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># docker-compose.yml\r\n\r\n# description\r\n\r\nservices:\r\n  zookeeper:\r\n    image: confluentinc/cp-zookeeper:7.4.0\r\n    container_name: zookeeper\r\n    environment:\r\n      ZOOKEEPER_CLIENT_PORT: 2181\r\n      ZOOKEEPER_TICK_TIME: 2000\r\n    ports:\r\n      - \"2181:2181\"\r\n\r\n  kafka:\r\n    image: confluentinc/cp-kafka:7.4.0\r\n    container_name: kafka\r\n    depends_on:\r\n      - zookeeper\r\n    ports:\r\n      - \"9092:9092\"\r\n      - \"9093:9093\"\r\n    environment:\r\n      KAFKA_BROKER_ID: 1\r\n      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181\r\n      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT\r\n      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:9093\r\n      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1\r\n      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL\r\n\r\n  flask-app:\r\n    build: . # Tells Docker to use the Dockerfile in the current directory\r\n    container_name: flask-app\r\n    depends_on:\r\n      - kafka\r\n    ports:\r\n      - \"8080:8000\"\r\n    environment:\r\n      KAFKA_BOOTSTRAP_SERVERS: kafka:9093 # Use the service name and internal port for inter-container communication\r\n\r\n  ws-server:\r\n    build: .\r\n    ports:\r\n      - \"8765:8765\"\r\n    command: python src/server.py\r\n    volumes:\r\n      - .:/app\r\n    working_dir: /app\r\n    restart: unless-stopped\r\n\r\n  mongodb:\r\n    image: mongo:latest\r\n    container_name: mongodb\r\n    restart: unless-stopped\r\n    ports:\r\n      - \"27017:27017\"\r\n    environment:\r\n      MONGO_INITDB_ROOT_USERNAME: user\r\n      MONGO_INITDB_ROOT_PASSWORD: password\r\n    volumes:\r\n      - mongodb_data:/data/db\r\n    networks:\r\n      - mongodb_network\r\n\r\n  mongo-express:\r\n    image: mongo-express:latest\r\n    container_name: mongo-express\r\n    restart: unless-stopped\r\n    ports:\r\n      - \"8081:8081\"\r\n    environment:\r\n      ME_CONFIG_MONGODB_ADMINUSERNAME: user\r\n      ME_CONFIG_MONGODB_ADMINPASSWORD: password\r\n      ME_CONFIG_MONGODB_URL: mongodb://user:password@mongodb:27017/\r\n    networks:\r\n      - mongodb_network\r\n    depends_on:\r\n      - mongodb\r\n\r\nvolumes:\r\n  mongodb_data:\r\n\r\nnetworks:\r\n  mongodb_network:\r\n    driver: bridge
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/docker-compose.yml b/docker-compose.yml
+--- a/docker-compose.yml	(revision 50420455a6fc9039bb43233203c0d82ef6e4358c)
++++ b/docker-compose.yml	(date 1775018143173)
+@@ -1,85 +1,85 @@
+-# docker-compose.yml
+-
+-# description
+-
+-services:
+-  zookeeper:
+-    image: confluentinc/cp-zookeeper:7.4.0
+-    container_name: zookeeper
+-    environment:
+-      ZOOKEEPER_CLIENT_PORT: 2181
+-      ZOOKEEPER_TICK_TIME: 2000
+-    ports:
+-      - "2181:2181"
+-
+-  kafka:
+-    image: confluentinc/cp-kafka:7.4.0
+-    container_name: kafka
+-    depends_on:
+-      - zookeeper
+-    ports:
+-      - "9092:9092"
+-      - "9093:9093"
+-    environment:
+-      KAFKA_BROKER_ID: 1
+-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:9093
+-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
+-
+-  flask-app:
+-    build: . # Tells Docker to use the Dockerfile in the current directory
+-    container_name: flask-app
+-    depends_on:
+-      - kafka
+-    ports:
+-      - "8080:8000"
+-    environment:
+-      KAFKA_BOOTSTRAP_SERVERS: kafka:9093 # Use the service name and internal port for inter-container communication
+-
+-  ws-server:
+-    build: .
+-    ports:
+-      - "8765:8765"
+-    command: python src/server.py
+-    volumes:
+-      - .:/app
+-    working_dir: /app
+-    restart: unless-stopped
+-
+-  mongodb:
+-    image: mongo:latest
+-    container_name: mongodb
+-    restart: unless-stopped
+-    ports:
+-      - "27017:27017"
+-    environment:
+-      MONGO_INITDB_ROOT_USERNAME: user
+-      MONGO_INITDB_ROOT_PASSWORD: password
+-    volumes:
+-      - mongodb_data:/data/db
+-    networks:
+-      - mongodb_network
+-
+-  mongo-express:
+-    image: mongo-express:latest
+-    container_name: mongo-express
+-    restart: unless-stopped
+-    ports:
+-      - "8081:8081"
+-    environment:
+-      ME_CONFIG_MONGODB_ADMINUSERNAME: user
+-      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+-      ME_CONFIG_MONGODB_URL: mongodb://user:password@mongodb:27017/
+-    networks:
+-      - mongodb_network
+-    depends_on:
+-      - mongodb
+-
+-volumes:
+-  mongodb_data:
+-
+-networks:
+-  mongodb_network:
+-    driver: bridge
+\ No newline at end of file
++## docker-compose.yml
++#
++## description
++#
++#services:
++#  zookeeper:
++#    image: confluentinc/cp-zookeeper:7.4.0
++#    container_name: zookeeper
++#    environment:
++#      ZOOKEEPER_CLIENT_PORT: 2181
++#      ZOOKEEPER_TICK_TIME: 2000
++#    ports:
++#      - "2181:2181"
++#
++#  kafka:
++#    image: confluentinc/cp-kafka:7.4.0
++#    container_name: kafka
++#    depends_on:
++#      - zookeeper
++#    ports:
++#      - "9092:9092"
++#      - "9093:9093"
++#    environment:
++#      KAFKA_BROKER_ID: 1
++#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
++#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
++#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:9093
++#      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
++#      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
++#
++#  flask-app:
++#    build: . # Tells Docker to use the Dockerfile in the current directory
++#    container_name: flask-app
++#    depends_on:
++#      - kafka
++#    ports:
++#      - "8080:8000"
++#    environment:
++#      KAFKA_BOOTSTRAP_SERVERS: kafka:9093 # Use the service name and internal port for inter-container communication
++#
++#  ws-server:
++#    build: .
++#    ports:
++#      - "8765:8765"
++#    command: python src/server.py
++#    volumes:
++#      - .:/app
++#    working_dir: /app
++#    restart: unless-stopped
++#
++#  mongodb:
++#    image: mongo:latest
++#    container_name: mongodb
++#    restart: unless-stopped
++#    ports:
++#      - "27017:27017"
++#    environment:
++#      MONGO_INITDB_ROOT_USERNAME: user
++#      MONGO_INITDB_ROOT_PASSWORD: password
++#    volumes:
++#      - mongodb_data:/data/db
++#    networks:
++#      - mongodb_network
++#
++#  mongo-express:
++#    image: mongo-express:latest
++#    container_name: mongo-express
++#    restart: unless-stopped
++#    ports:
++#      - "8081:8081"
++#    environment:
++#      ME_CONFIG_MONGODB_ADMINUSERNAME: user
++#      ME_CONFIG_MONGODB_ADMINPASSWORD: password
++#      ME_CONFIG_MONGODB_URL: mongodb://user:password@mongodb:27017/
++#    networks:
++#      - mongodb_network
++#    depends_on:
++#      - mongodb
++#
++#volumes:
++#  mongodb_data:
++#
++#networks:
++#  mongodb_network:
++#    driver: bridge
+\ No newline at end of file
+Index: Dockerfile
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># Dockerfile\r\n\r\n# description\r\n\r\n# syntax=docker/dockerfile:1\r\n\r\nARG PYTHON_VERSION=3.13.12\r\nFROM python:${PYTHON_VERSION}-slim as base\r\n\r\n# Prevents Python from writing pyc files.\r\nENV PYTHONDONTWRITEBYTECODE=1\r\n\r\n# Keeps Python from buffering stdout and stderr to avoid situations where\r\n# the application crashes without emitting any logs due to buffering.\r\nENV PYTHONUNBUFFERED=1\r\n\r\nWORKDIR .\r\n\r\n# Create a non-privileged user that the app will run under.\r\n# See https://docs.docker.com/go/dockerfile-user-best-practices/\r\nARG UID=10001\r\nRUN adduser \\\r\n    --disabled-password \\\r\n    --gecos \"\" \\\r\n    --home \"/nonexistent\" \\\r\n    --shell \"/sbin/nologin\" \\\r\n    --no-create-home \\\r\n    --uid \"${UID}\" \\\r\n    appuser\r\n\r\nRUN --mount=type=cache,target=/root/.cache/pip \\\r\n    --mount=type=bind,source=requirements.txt,target=requirements.txt \\\r\n    python -m pip install -r requirements.txt\r\n\r\n# Switch to the non-privileged user to run the application.\r\nUSER appuser\r\n\r\n# Copy the source code into the container.\r\nCOPY . .\r\n\r\n# Expose the port that the application listens on.\r\nEXPOSE 8000\r\n\r\n# Run the application.\r\nCMD [\"python\", \"src/app.py\", \"src/server.py\", \"src/database.py\", \"src/client.py\"]\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Dockerfile b/Dockerfile
+--- a/Dockerfile	(revision 50420455a6fc9039bb43233203c0d82ef6e4358c)
++++ b/Dockerfile	(date 1775018224608)
+@@ -4,7 +4,7 @@
+ 
+ # syntax=docker/dockerfile:1
+ 
+-ARG PYTHON_VERSION=3.13.12
++ARG PYTHON_VERSION=3.14.0
+ FROM python:${PYTHON_VERSION}-slim as base
+ 
+ # Prevents Python from writing pyc files.
+@@ -42,4 +42,4 @@
+ EXPOSE 8000
+ 
+ # Run the application.
+-CMD ["python", "src/app.py", "src/server.py", "src/database.py", "src/client.py"]
++CMD [".src\data_ingestion\data_extractor.py"]
+Index: src/data_ingestion/data_uploader.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>##################\r\n# data_uploader.py\r\n##################\r\n\r\n###################\r\n# import statements\r\n###################\r\n\r\nimport sys\r\nimport os\r\nimport boto3\r\nfrom dotenv import load_dotenv\r\nfrom pathlib import Path\r\n\r\n##################\r\n# global variables\r\n##################\r\n\r\n# define the folder and file paths for the csv data file\r\n# create s3 client\r\n\r\nfolder_path = Path(\"./data/raw\")\r\n# os.makedirs(folder_path, exist_ok=True)\r\n\r\n# assign env variables\r\nload_dotenv()\r\naccess_key = os.getenv(\"AWS_ACCESS_KEY_ID\")\r\nsecret_key = os.getenv(\"AWS_SECRET_ACCESS_KEY\")\r\nregion = os.getenv(\"AWS_DEFAULT_REGION\")\r\nbucket_name = os.getenv(\"AWS_S3_BUCKET_NAME\")\r\n\r\n##################\r\n# module functions\r\n##################\r\n\r\n# verify the upload status by checking for bucket contents\r\ndef verify_upload():\r\n    global bucket_name, region\r\n    print(\"Verifying upload status...\")\r\n\r\n    try:\r\n        s3 = boto3.client(\"s3\", region_name=region)\r\n\r\n        response = s3.list_objects_v2(\r\n            Bucket=bucket_name,\r\n            Prefix=\"raw_data/\"\r\n        )\r\n\r\n        file_count = response[\"Contents\"]\r\n        if \"Contents\" not in response:\r\n            print(\"No files found.\")\r\n        elif file_count:\r\n            print(f\"There are {len(file_count)} files.\")\r\n\r\n        total_size = 0\r\n        for file in file_count:\r\n            file_size = file[\"Size\"] / (1024 * 1024)\r\n            total_size += file_size\r\n\r\n        print(f\"Data size: {total_size: .2f} MB\")\r\n        print(\"Upload successfully verified.\")\r\n\r\n    except Exception as connection_error:\r\n        print(f\"Unable to verify upload status.\\nError: {connection_error}\")\r\n\r\n# load the data into the s3 bucket\r\ndef data_load(s3):\r\n    global folder_path, bucket_name\r\n\r\n    json_files = list(folder_path.glob(\"*.json\"))\r\n    csv_files = list(folder_path.glob(\"*.csv\"))\r\n    parquet_files = list(folder_path.glob(\"*.parquet\"))\r\n\r\n    uploaded_count = 0\r\n    for file in json_files:\r\n\r\n        # create data lake structure\r\n        s3_key = f\"raw_data/{file.name}\"\r\n        print(f\"\\nLoading data from {file.name}...\")\r\n\r\n        try:\r\n            s3.upload_file(file, bucket_name, s3_key)\r\n            print(f\"Data upload successful.\\nData uploaded to s3://{bucket_name}/{s3_key}\\n\")\r\n            uploaded_count += 1\r\n\r\n        except Exception as upload_error:\r\n            print(f\"Data upload failed.\\nError: {upload_error}\")\r\n\r\n    if uploaded_count == len(json_files):\r\n        print(f\"Successfully loaded {len(json_files)} files.\\n\")\r\n    else:\r\n        print(f\"Only {len(files)} files were successfully loaded.\")\r\n\r\n# connect to the s3 bucket\r\ndef connect_aws():\r\n    load_dotenv()\r\n\r\n    if not bucket_name:\r\n        print(\"Error: AWS_S3_BUCKET_NAME not found\")\r\n\r\n    print(\"Testing AWS connection...\")\r\n    print(f\"Region: {region}\")\r\n\r\n    # attempt to connect to the s3 bucket\r\n    try:\r\n        s3 = boto3.client(\r\n            \"s3\",\r\n            aws_access_key_id=access_key,\r\n            aws_secret_access_key=secret_key,\r\n            region_name=region\r\n        )\r\n\r\n        try:\r\n            s3.head_bucket(Bucket=bucket_name)\r\n            print(\"S3 bucket already exists.\")\r\n        except:\r\n            print(f\"Creating bucket {bucket_name}\")\r\n            if region == \"us-east-1\":\r\n                s3.create_bucket(Bucket=bucket_name)\r\n            else:\r\n                s3.create_bucket(\r\n                    Bucket=bucket_name,\r\n                    CreateBucketConfiguration={\"LocationConstraint\": region}\r\n                )\r\n                print(f\"Bucket {bucket_name} created.\")\r\n\r\n        # verify buckets\r\n        print(f\"Connection successful: Bucket {bucket_name} connected.\")\r\n\r\n        # upload the file to the s3 bucket\r\n        data_load(s3)\r\n\r\n    except Exception as e:\r\n        print(f\"Connection failed: {e}\")\r\n\r\ndef main():\r\n    # test the aws s3 connection\r\n    connect_aws()\r\n\r\n    # verify the file contents were uploaded successfully\r\n    verify_upload()\r\n\r\nif __name__ == \"__main__\":\r\n    sys.exit(main())
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/data_ingestion/data_uploader.py b/src/data_ingestion/data_uploader.py
+--- a/src/data_ingestion/data_uploader.py	(revision 50420455a6fc9039bb43233203c0d82ef6e4358c)
++++ b/src/data_ingestion/data_uploader.py	(date 1775018143159)
+@@ -72,7 +72,7 @@
+     parquet_files = list(folder_path.glob("*.parquet"))
+ 
+     uploaded_count = 0
+-    for file in json_files:
++    for file in parquet_files:
+ 
+         # create data lake structure
+         s3_key = f"raw_data/{file.name}"
+@@ -89,7 +89,7 @@
+     if uploaded_count == len(json_files):
+         print(f"Successfully loaded {len(json_files)} files.\n")
+     else:
+-        print(f"Only {len(files)} files were successfully loaded.")
++        print(f"Only {len(parquet_files)} files were successfully loaded.")
+ 
+ # connect to the s3 bucket
+ def connect_aws():
+Index: src/templates/template.html
+===================================================================
+diff --git a/src/templates/template.html b/src/templates/template.html
+deleted file mode 100644
+--- a/src/templates/template.html	(revision 50420455a6fc9039bb43233203c0d82ef6e4358c)
++++ /dev/null	(revision 50420455a6fc9039bb43233203c0d82ef6e4358c)
+@@ -1,20 +0,0 @@
+-<!-- template.html -->
+-
+-<!DOCTYPE html>
+-<html lang="en">
+-<head>
+-    <title>REST API</title>
+-</head>
+-<body>
+-    <ul id="navigation">
+-    {% for item in navigation %}
+-        <li><a href="{{ item.href }}">{{ item.caption }}</a></li>
+-    {% endfor %}
+-    </ul>
+-
+-    <h1>Data Extraction</h1>
+-    {{ a_variable }}
+-
+-    {# a comment #}
+-</body>
+-</html>
+\ No newline at end of file
+Index: src/app.py
+===================================================================
+diff --git a/src/app.py b/src/app.py
+deleted file mode 100644
+--- a/src/app.py	(revision 50420455a6fc9039bb43233203c0d82ef6e4358c)
++++ /dev/null	(revision 50420455a6fc9039bb43233203c0d82ef6e4358c)
+@@ -1,15 +0,0 @@
+-# app.py
+-
+-# description
+-
+-# import statements
+-from flask import Flask, render_template
+-
+-app = Flask(__name__)
+-@app.route('/')
+-
+-def template():
+-    return render_template('template.html')
+-
+-if __name__ == '__main__':
+-    app.run(host='0.0.0.0', port=8000, debug=True)
+\ No newline at end of file
+Index: .idea/data_ingestion.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<module type=\"PYTHON_MODULE\" version=\"4\">\r\n  <component name=\"NewModuleRootManager\">\r\n    <content url=\"file://$MODULE_DIR$\" />\r\n    <orderEntry type=\"jdk\" jdkName=\"data_ingestion\" jdkType=\"Python SDK\" />\r\n    <orderEntry type=\"sourceFolder\" forTests=\"false\" />\r\n  </component>\r\n</module>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/data_ingestion.iml b/.idea/data_ingestion.iml
+--- a/.idea/data_ingestion.iml	(revision 50420455a6fc9039bb43233203c0d82ef6e4358c)
++++ b/.idea/data_ingestion.iml	(date 1775017033206)
+@@ -1,8 +1,10 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <module type="PYTHON_MODULE" version="4">
+   <component name="NewModuleRootManager">
+-    <content url="file://$MODULE_DIR$" />
+-    <orderEntry type="jdk" jdkName="data_ingestion" jdkType="Python SDK" />
++    <content url="file://$MODULE_DIR$">
++      <excludeFolder url="file://$MODULE_DIR$/.venv" />
++    </content>
++    <orderEntry type="jdk" jdkName="Python 3.14 (ELT-Data-Pipeline)" jdkType="Python SDK" />
+     <orderEntry type="sourceFolder" forTests="false" />
+   </component>
+ </module>
+\ No newline at end of file
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"Black\">\r\n    <option name=\"sdkName\" value=\"data_ingestion\" />\r\n  </component>\r\n  <component name=\"ProjectRootManager\" version=\"2\" project-jdk-name=\"data_ingestion\" project-jdk-type=\"Python SDK\" />\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision 50420455a6fc9039bb43233203c0d82ef6e4358c)
++++ b/.idea/misc.xml	(date 1775017033238)
+@@ -3,5 +3,5 @@
+   <component name="Black">
+     <option name="sdkName" value="data_ingestion" />
+   </component>
+-  <component name="ProjectRootManager" version="2" project-jdk-name="data_ingestion" project-jdk-type="Python SDK" />
++  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.14 (ELT-Data-Pipeline)" project-jdk-type="Python SDK" />
+ </project>
+\ No newline at end of file
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"e2debfdd-678d-47ef-9081-c4397bd37b99\" name=\"Changes\" comment=\"feat: changed some items around to prune program.&#10;doc: resolved requirements.txt problem again... gridstatus created difficulty with pip dependencies.\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"HTML File\" />\r\n        <option value=\"Python Script\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"GitHubPullRequestSearchHistory\">{\r\n  &quot;lastFilter&quot;: {\r\n    &quot;state&quot;: &quot;OPEN&quot;,\r\n    &quot;assignee&quot;: &quot;AbsoluteAI&quot;\r\n  }\r\n}</component>\r\n  <component name=\"GithubPullRequestsUISettings\">{\r\n  &quot;selectedUrlAndAccountId&quot;: {\r\n    &quot;url&quot;: &quot;https://github.com/AbsoluteAI/data_api.git&quot;,\r\n    &quot;accountId&quot;: &quot;37e186d4-5da8-40d5-93a4-45b495f5697a&quot;\r\n  }\r\n}</component>\r\n  <component name=\"McpProjectServerCommands\">\r\n    <commands />\r\n    <urls />\r\n  </component>\r\n  <component name=\"ProblemsViewState\">\r\n    <option name=\"selectedTabId\" value=\"CurrentFile\" />\r\n  </component>\r\n  <component name=\"ProjectColorInfo\">{\r\n  &quot;associatedIndex&quot;: 7\r\n}</component>\r\n  <component name=\"ProjectId\" id=\"3Alrnn25XwtFCp7QPZSu5wWgrhp\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">{\r\n  &quot;keyToString&quot;: {\r\n    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,\r\n    &quot;Docker.API.executor&quot;: &quot;Run&quot;,\r\n    &quot;Docker.Docker Image.executor&quot;: &quot;Run&quot;,\r\n    &quot;Docker.data_ingestion.executor&quot;: &quot;Run&quot;,\r\n    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,\r\n    &quot;Python.Flask App.executor&quot;: &quot;Debug&quot;,\r\n    &quot;Python.app.executor&quot;: &quot;Run&quot;,\r\n    &quot;Python.database.executor&quot;: &quot;Run&quot;,\r\n    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,\r\n    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,\r\n    &quot;git-widget-placeholder&quot;: &quot;master&quot;,\r\n    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;\r\n  }\r\n}</component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"MoveFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\E7168849\\PycharmProjects\\Streaming Data Pipeline\\data_ingestion\" />\r\n      <recent name=\"C:\\Users\\E7168849\\PycharmProjects\\Streaming Data Pipeline\\data_ingestion\\src\\templates\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"RunManager\">\r\n    <configuration name=\"Docker Image\" type=\"docker-deploy\" factoryName=\"docker-image\" server-name=\"Docker\">\r\n      <deployment type=\"docker-image\">\r\n        <settings>\r\n          <option name=\"imageTag\" value=\"0d0d8ae504fe\" />\r\n          <option name=\"containerName\" value=\"flask-app\" />\r\n        </settings>\r\n      </deployment>\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration default=\"true\" type=\"docker-deploy\" factoryName=\"docker-image\" temporary=\"true\">\r\n      <deployment type=\"docker-image\">\r\n        <settings />\r\n      </deployment>\r\n      <method v=\"2\" />\r\n    </configuration>\r\n  </component>\r\n  <component name=\"SharedIndexes\">\r\n    <attachedChunks>\r\n      <set>\r\n        <option value=\"bundled-python-sdk-2653e85de345-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.31033.139\" />\r\n      </set>\r\n    </attachedChunks>\r\n  </component>\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\r\n      <changelist id=\"e2debfdd-678d-47ef-9081-c4397bd37b99\" name=\"Changes\" comment=\"\" />\r\n      <created>1773178169218</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1773178169218</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"feat: added docker, flask, and apache kafka. next needs confluent_kafka import resolution.&#10;doc: added notes and fixed requirements.txt file\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1773273544054</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1773273544055</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"feat: Added kafka, websocket, mongodb database files and containers.&#10;doc: Added basic documentation. Requirements.txt error persists.\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1773358309800</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1773358309800</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"feat: changed some items around to prune program.&#10;doc: resolved requirements.txt problem again... gridstatus created difficulty with pip dependencies.\">\r\n      <option name=\"closed\" value=\"true\" />\r\n      <created>1773431136146</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1773431136146</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"4\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"feat: added docker, flask, and apache kafka. next needs confluent_kafka import resolution.&#10;doc: added notes and fixed requirements.txt file\" />\r\n    <MESSAGE value=\"feat: Added kafka, websocket, mongodb database files and containers.&#10;doc: Added basic documentation. Requirements.txt error persists.\" />\r\n    <MESSAGE value=\"feat: changed some items around to prune program.&#10;doc: resolved requirements.txt problem again... gridstatus created difficulty with pip dependencies.\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"feat: changed some items around to prune program.&#10;doc: resolved requirements.txt problem again... gridstatus created difficulty with pip dependencies.\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 50420455a6fc9039bb43233203c0d82ef6e4358c)
++++ b/.idea/workspace.xml	(date 1775018936940)
+@@ -4,13 +4,17 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="e2debfdd-678d-47ef-9081-c4397bd37b99" name="Changes" comment="feat: changed some items around to prune program.&#10;doc: resolved requirements.txt problem again... gridstatus created difficulty with pip dependencies.">
+-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-    </list>
++    <list default="true" id="e2debfdd-678d-47ef-9081-c4397bd37b99" name="Changes" comment="feat: changed some items around to prune program.&#10;doc: resolved requirements.txt problem again... gridstatus created difficulty with pip dependencies." />
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+     <option name="LAST_RESOLUTION" value="IGNORE" />
++  </component>
++  <component name="ChangesViewManager" show_ignored="true">
++    <option name="groupingKeys">
++      <option value="directory" />
++      <option value="repository" />
++    </option>
+   </component>
+   <component name="FileTemplateManagerImpl">
+     <option name="RECENT_TEMPLATES">
+@@ -50,24 +54,28 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent">{
+-  &quot;keyToString&quot;: {
+-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+-    &quot;Docker.API.executor&quot;: &quot;Run&quot;,
+-    &quot;Docker.Docker Image.executor&quot;: &quot;Run&quot;,
+-    &quot;Docker.data_ingestion.executor&quot;: &quot;Run&quot;,
+-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+-    &quot;Python.Flask App.executor&quot;: &quot;Debug&quot;,
+-    &quot;Python.app.executor&quot;: &quot;Run&quot;,
+-    &quot;Python.database.executor&quot;: &quot;Run&quot;,
+-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
++  <component name="PropertiesComponent"><![CDATA[{
++  "keyToString": {
++    "DefaultHtmlFileTemplate": "HTML File",
++    "Docker.API.executor": "Run",
++    "Docker.Docker Image.executor": "Run",
++    "Docker.data_ingestion.executor": "Run",
++    "ModuleVcsDetector.initialDetectionPerformed": "true",
++    "Python.Flask App.executor": "Debug",
++    "Python.app.executor": "Run",
++    "Python.data_extractor.executor": "Run",
++    "Python.database.executor": "Run",
++    "RunOnceActivity.MCP Project settings loaded": "true",
++    "RunOnceActivity.ShowReadmeOnStart": "true",
++    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
++    "RunOnceActivity.git.unshallow": "true",
++    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
++    "git-widget-placeholder": "master",
++    "junie.onboarding.icon.badge.shown": "true",
++    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
++    "to.speed.mode.migration.done": "true"
+   }
+-}</component>
++}]]></component>
+   <component name="RecentsManager">
+     <key name="MoveFile.RECENT_KEYS">
+       <recent name="C:\Users\E7168849\PycharmProjects\Streaming Data Pipeline\data_ingestion" />
+@@ -94,7 +102,7 @@
+   <component name="SharedIndexes">
+     <attachedChunks>
+       <set>
+-        <option value="bundled-python-sdk-2653e85de345-6d6dccd035ac-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.31033.139" />
++        <option value="bundled-python-sdk-0978a7220b69-9867c7d4c0a4-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-253.28294.336" />
+       </set>
+     </attachedChunks>
+   </component>

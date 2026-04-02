@@ -4,7 +4,7 @@
 
 # syntax=docker/dockerfile:1
 
-ARG PYTHON_VERSION=3.13.12
+ARG PYTHON_VERSION=3.14.0
 FROM python:${PYTHON_VERSION}-slim as base
 
 # Prevents Python from writing pyc files.
@@ -42,4 +42,4 @@ COPY . .
 EXPOSE 8000
 
 # Run the application.
-CMD ["python", "src/app.py", "src/server.py", "src/database.py", "src/client.py"]
+CMD [".src\data_ingestion\data_extractor.py"]
