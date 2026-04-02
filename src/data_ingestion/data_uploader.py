@@ -38,6 +38,8 @@ def verify_upload():
     global bucket_name, region
     print("Verifying upload status...")
 
+    load_dotenv()
+
     try:
         s3 = boto3.client("s3", region_name=region)
 
@@ -67,8 +69,10 @@ def verify_upload():
 def data_load(s3):
     global folder_path, bucket_name
 
-    json_files = list(folder_path.glob("*.json"))
-    csv_files = list(folder_path.glob("*.csv"))
+    load_dotenv()
+
+    # json_files = list(folder_path.glob("*.json"))
+    # csv_files = list(folder_path.glob("*.csv"))
     parquet_files = list(folder_path.glob("*.parquet"))
 
     uploaded_count = 0

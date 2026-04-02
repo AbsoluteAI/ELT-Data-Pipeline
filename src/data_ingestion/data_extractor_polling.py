@@ -14,10 +14,10 @@ import os
 from dotenv import load_dotenv
 from pyarrow import csv, parquet
 import pandas as pd
-import time
 import glob
 import data_uploader
 from prefect import flow, task, get_run_logger
+import subprocess
 
 ##################
 # global variables
@@ -27,14 +27,14 @@ folder_path = Path("./data/raw")
 file_name = Path("nasa_solar_flare_data")
 full_path = os.path.join(folder_path, file_name)
 # os.makedirs(folder_path, exist_ok=True)
-seconds = 60
-minutes = 1
-step_interval = seconds * minutes
-call_count = 0
+# seconds = 60
+# minutes = 1
+# step_interval = seconds * minutes
+# call_count = 0
 
 load_dotenv()
 marketstack_api_key = os.getenv("MARKETSTACK_API_KEY")
-url = f"https://api.marketstack.com/v1/eod?access_key={marketstack_api_key}"
+url = f"https://api.marketstack.com/v2/eod?access_key={marketstack_api_key}"
 
 ##################
 # module functions
@@ -106,50 +106,48 @@ def create_json_file(data):
 
 @flow(name="run_poll")
 def run_poll():
-    global url, call_count, step_interval
+    global url
 
     logger = get_run_logger()
     logger.info("Polling API for data extraction...")
 
-    call_count +=1
-    print(f"\nCall {call_count}:")
-
     try:
-        response = requests.get(url)
+        # response = requests.get(url)
+        headers = {"Accept": "application/json"}
+        data = []
+        response = requests.post(url, headers=headers, json=data)
 
-        if requests.get(url).status_code == 200:
-            data = response.json()
-            print("Data successfully retrieved")
+        data = response.json()
+        print(f"Data: {data}")
+        print("Data successfully retrieved")
 
-            create_json_file(data)
+        create_json_file(data)
 
-            df = pd.DataFrame(data)
-            create_csv_file(df)
+        df = pd.DataFrame(data)
+        create_csv_file(df)
 
-            csv_to_parquet()
+        csv_to_parquet()
 
-            data_uploader.main()
+        data_uploader.main()
 
-        else:
-            print(f"Status code: {response.status_code}")
     except Exception as e:
         print(f"Error retrieving data: {e}")
 
-    try:
-        print("\nNext call in:")
-
-        duration_in_seconds = step_interval
-        for remaining in range(duration_in_seconds, 0, -1):
-            mins, secs = divmod(remaining, 60)
-            timer_display = "{:02}:{:02}".format(mins, secs)
-
-            sys.stdout.write("\r" + timer_display)
-            sys.stdout.flush()
-            time.sleep(1)
-        sys.stdout.write("\n")
-
-    except Exception as e:
-        print(f"Timer error: {e}")
+    # try:
+    #     print("\nNext call in:")
+    #
+    #     duration_in_seconds = step_interval
+    #     for remaining in range(duration_in_seconds, 0, -1):
+    #         mins, secs = divmod(remaining, 60)
+    #         timer_display = "{:02}:{:02}".format(mins, secs)
+    #
+    #         sys.stdout.write("\r" + timer_display)
+    #         sys.stdout.flush()
+    #         time.sleep(1)
+    #     sys.stdout.write("\n")
+    #
+    # except Exception as e:
+    #     print(f"Timer error: {e}")
 
 def main():
     run_poll()
