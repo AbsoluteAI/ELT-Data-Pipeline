@@ -1,28 +1,26 @@
+# test_mysqldb_connection.py
+
+# import statements
 from dotenv import load_dotenv
 import os
 import mysql.connector
-from mysql.connector.plugins import caching_sha2_password
 
 # global variables
 load_dotenv()
 mysql_username = os.getenv("MYSQL_USERNAME")
 mysql_password = os.getenv("MYSQL_PASSWORD")
 mysql_host = os.getenv("MYSQL_HOST")
-mysql_database = os.getenv("MYSQL_DATABASE")
 
 def mysql_db_connect():
-    global mysql_username, mysql_password, mysql_host, mysql_database
-
+    global mysql_username, mysql_password, mysql_host
 
     config = {
         "user": mysql_username,
         "password": mysql_password,
-        "host": mysql_host,
-        "database": mysql_database,
-        "raise_on_warnings": True
+        "host": mysql_host
     }
 
-    print(f"Connecting to mysql DB: {mysql_database}")
+    print(f"Connecting to mysql DB {mysql_username}@{mysql_host}")
 
     try:
         conn = mysql.connector.connect(**config, use_pure=True)

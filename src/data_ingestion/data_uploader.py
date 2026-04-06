@@ -11,6 +11,7 @@ import os
 import boto3
 from dotenv import load_dotenv
 from pathlib import Path
+from prefect import task
 
 ##################
 # global variables
@@ -34,6 +35,7 @@ bucket_name = os.getenv("AWS_S3_BUCKET_NAME")
 ##################
 
 # verify the upload status by checking for bucket contents
+# @task(name=verify_upload)
 def verify_upload():
     global bucket_name, region
     print("Verifying upload status...")
@@ -66,6 +68,7 @@ def verify_upload():
         print(f"Unable to verify upload status.\nError: {connection_error}")
 
 # load the data into the s3 bucket
+# @task(name=data_load)
 def data_load(s3):
     global folder_path, bucket_name
 
@@ -96,11 +99,11 @@ def data_load(s3):
         print(f"Only {len(parquet_files)} files were successfully loaded.")
 
 # connect to the s3 bucket
+# @task(name=connect_aws)
 def connect_aws():
-    load_dotenv()
+    global bucket_name
 
-    if not bucket_name:
-        print("Error: AWS_S3_BUCKET_NAME not found")
+    load_dotenv()
 
     print("Testing AWS connection...")
     print(f"Region: {region}")
@@ -114,35 +117,24 @@ def connect_aws():
             region_name=region
         )
 
-        try:
-            s3.head_bucket(Bucket=bucket_name)
+        if s3.head_bucket(Bucket=bucket_name):
             print("S3 bucket already exists.")
-        except:
-            print(f"Creating bucket {bucket_name}")
-            if region == "us-east-1":
-                s3.create_bucket(Bucket=bucket_name)
-            else:
+            return s3
+
+        elif not s3.head_bucket(Bucket=bucket_name):
+            try:
                 s3.create_bucket(
                     Bucket=bucket_name,
                     CreateBucketConfiguration={"LocationConstraint": region}
                 )
+
                 print(f"Bucket {bucket_name} created.")
 
-        # verify buckets
-        print(f"Connection successful: Bucket {bucket_name} connected.")
+                # upload the file to the s3 bucket
+                return s3
 
-        # upload the file to the s3 bucket
-        data_load(s3)
+            except Exception as e:
+                print(f"Bucket creation failed.\nError: {e}")
 
     except Exception as e:
         print(f"Connection failed: {e}")
-
-def main():
-    # test the aws s3 connection
-    connect_aws()
-
-    # verify the file contents were uploaded successfully
-    verify_upload()
-
-if __name__ == "__main__":
-    sys.exit(main())

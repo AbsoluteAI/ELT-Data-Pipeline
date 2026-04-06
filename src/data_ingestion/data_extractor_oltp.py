@@ -7,6 +7,8 @@ import mysql.connector
 import pandas as pd
 from sqlalchemy import create_engine
 from pathlib import Path
+from prefect import flow, task
+from data_uploader import connect_aws, data_load, verify_upload
 
 # global variables
 load_dotenv()
@@ -16,6 +18,7 @@ mysql_host = os.getenv("MYSQL_HOST")
 mysql_database = os.getenv("MYSQL_DATABASE")
 folder_path = Path("./data/raw")
 
+# @task(name=fetch_data)
 def fetch_data():
     global folder_path, mysql_username, mysql_password, mysql_host, mysql_database
     try:
@@ -41,9 +44,9 @@ def fetch_data():
     except Exception as e:
         print(f"Could not find any csv files: {e}")
 
+# @task(name=mysql_db_connect)
 def mysql_db_connect():
     global mysql_username, mysql_password, mysql_host, mysql_database
-
 
     config = {
         "user": mysql_username,
@@ -61,12 +64,25 @@ def mysql_db_connect():
             print("Connected to MySQL DB")
             cursor = conn.cursor()
             cursor.execute(f"CREATE DATABASE IF NOT EXISTS {mysql_database}")
+            return True
         else:
             return False
 
     except Exception as e:
         print(f"Could not connect to MYSQL DB: {e}")
 
+def main():
+    success = mysql_db_connect()
+    if success:
+        try:
+            fetch_data()
+            # s3 = connect_aws()
+            # data_load(s3)
+            # verify_upload()
+        except Exception as e:
+            print(f"Could not fetch data: {e}")
+    else:
+        return False
+
 if __name__ == "__main__":
-    mysql_db_connect()
-    fetch_data()
+    sys.exit(main())
