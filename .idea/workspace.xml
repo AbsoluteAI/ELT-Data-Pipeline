@@ -4,15 +4,26 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e2debfdd-678d-47ef-9081-c4397bd37b99" name="Changes" comment="feat: changed some items around to prune program.&#10;doc: resolved requirements.txt problem again... gridstatus created difficulty with pip dependencies.">
+    <list default="true" id="e2debfdd-678d-47ef-9081-c4397bd37b99" name="Changes" comment="feat: initiated some prefect items and scouted new data sources.">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/raw/customers_master.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/raw/product_categories.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/raw/products_catalog.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/raw/sales_raw_oltp.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/raw/staff_records.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/raw/store_locations.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/raw/supplier_directory.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/data_ingestion.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/data_ingestion.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/data_ingestion/data_extractor_polling.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data_ingestion/data_extractor_polling.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/templates/template.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data_ingestion/data_extractor_oltp.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/data_ingestion/data_extractor_oltp.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data_ingestion/data_extractor_polling.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/data_transformation/data_processing.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/messaging/receive.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/messaging/send.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/test_api_connection.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/test_data_extraction.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/test_mysqldb_connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/test_mysqldb_connection.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,12 +53,12 @@
     &quot;assignee&quot;: &quot;AbsoluteAI&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/AbsoluteAI/ELT-Data-Pipeline.git",
-    "accountId": "40435743-e994-454d-be1a-89c2849293df"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/AbsoluteAI/ELT-Data-Pipeline.git&quot;,
+    &quot;accountId&quot;: &quot;40435743-e994-454d-be1a-89c2849293df&quot;
   }
-}]]></component>
+}</component>
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
@@ -63,29 +74,34 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;Docker.API.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.Docker Image.executor&quot;: &quot;Run&quot;,
-    &quot;Docker.data_ingestion.executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python.Flask App.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.app.executor&quot;: &quot;Run&quot;,
-    &quot;Python.data_extractor.executor&quot;: &quot;Run&quot;,
-    &quot;Python.database.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "Docker.API.executor": "Run",
+    "Docker.Docker Image.executor": "Run",
+    "Docker.data_ingestion.executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.Flask App.executor": "Debug",
+    "Python.app.executor": "Run",
+    "Python.data_extractor.executor": "Run",
+    "Python.database.executor": "Run",
+    "Python.test_mysqldb_connection.executor": "Run",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "master",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "C:/Users/aldod/PycharmProjects/ELT-Data-Pipeline/data/raw",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "to.speed.mode.migration.done": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\aldod\PycharmProjects\ELT-Data-Pipeline\data\raw" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\E7168849\PycharmProjects\Streaming Data Pipeline\data_ingestion" />
       <recent name="C:\Users\E7168849\PycharmProjects\Streaming Data Pipeline\data_ingestion\src\templates" />
@@ -147,7 +163,15 @@
       <option name="project" value="LOCAL" />
       <updated>1773431136146</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="feat: initiated some prefect items and scouted new data sources.">
+      <option name="closed" value="true" />
+      <created>1775112824423</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1775112824423</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -165,6 +189,7 @@
     <MESSAGE value="feat: added docker, flask, and apache kafka. next needs confluent_kafka import resolution.&#10;doc: added notes and fixed requirements.txt file" />
     <MESSAGE value="feat: Added kafka, websocket, mongodb database files and containers.&#10;doc: Added basic documentation. Requirements.txt error persists." />
     <MESSAGE value="feat: changed some items around to prune program.&#10;doc: resolved requirements.txt problem again... gridstatus created difficulty with pip dependencies." />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: changed some items around to prune program.&#10;doc: resolved requirements.txt problem again... gridstatus created difficulty with pip dependencies." />
+    <MESSAGE value="feat: initiated some prefect items and scouted new data sources." />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: initiated some prefect items and scouted new data sources." />
   </component>
 </project>
